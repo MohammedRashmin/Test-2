@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bike Rent</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        select, input {
+            margin: 5px 0;
+            padding: 8px;
+            width: 100%;
+        }
+        button {
+            padding: 10px 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="bikeTitle">Bike Title: </h1>
+
+    <h2>Lending Details</h2>
+    <form id="lendingForm">
+        <label for="memberSelect">Member:</label>
+        <select id="memberSelect" name="member" required></select><br>
+        
+        <label for="rentDate">Renting Date:</label>
+        <input type="date" id="rentDate" name="rentDate" required><br>
+        
+        <label for="lendingDays">Number of Lending Days:</label>
+        <input type="number" id="lendingDays" name="lendingDays" required><br>
+        
+        <button type="submit">Save Lending Details</button>
+    </form>
+
+    <h2>Lending History</h2>
+    <table id="lendingTable">
+        <thead>
+            <tr>
+                <th>Member</th>
+                <th>Renting Date</th>
+                <th>Lending Days</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Rows will be inserted here by JavaScript -->
+        </tbody>
+    </table>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const bikeId = urlParams.get('bikeId');
+            const bikeTitleElement = document.getElementById('bikeTitle');
+            const memberSelect = document.getElementById('memberSelect');
+            const lendingTableBody = document.querySelector('#lendingTable tbody');
+            const lendingForm = document.getElementById('lendingForm');
+
+            // Fetch bikes and members from local storage
+            const bikes = JSON.parse(localStorage.getItem('bikes')) || [];
+            const members = JSON.parse(localStorage.getItem('members')) || [];
+            let bike = bikes.find(bike => bike.id == bikeId);
+
+            if (bike) {
+                bikeTitleElement.textContent = `Bike Title: ${bike.title}`;
+            } else {
+                bikeTitleElement.textContent = 'Bike not found';
+            }
+
+            // Populate member dropdown
+            members.forEach(member => {
+                const option = document.createElement('option');
+                option.value = member.id;
+                option.textContent = member.name;
+                memberSelect.appendChild(option);
+            });
+
+            // Load lending details from local storage
+            const lendings = JSON.parse(localStorage.getItem('lendings')) || [];
+            lendings.forEach(lending => {
+                if (lending.bikeId == bikeId) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${lending.member}</td>
+                        <td>${lending.rentDate}</td>
+                        <td>${lending.lendingDays}</td>
+                    `;
+                    lendingTableBody.appendChild(row);
+                }
+            });
+
+            // Handle form submission
+            lendingForm.onsubmit = function(e) {
+                e.preventDefault();
+                const member = memberSelect.value;
+                const rentDate = document.getElementById('rentDate').value;
+                const lendingDays = document.getElementById('lendingDays').value;
+
+                const newLending = { bikeId, member, rentDate, lendingDays };
+                let allLendings = JSON.parse(localStorage.getItem('lendings')) || [];
+                allLendings.push(newLending);
+                localStorage.setItem('lendings', JSON.stringify(allLendings));
+
+                // Add new lending details to the table
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${members.find(m => m.id == member)?.name || 'Unknown'}</td>
+                    <td>${rentDate}</td>
+                    <td>${lendingDays}</td>
+                `;
+                lendingTableBody.appendChild(row);
+            };
+        });
+    </script>
+</body>
+</html>

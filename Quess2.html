@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bikes GridView with Modal</title>
+    <style>
+        .grid-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .bike-card {
+            border: 1px solid #ddd;
+            padding: 10px;
+            width: calc(33% - 20px);
+            box-sizing: border-box;
+            text-align: center;
+        }
+        .bike-card h2 {
+            margin: 0 0 10px 0;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .modal form {
+            display: flex;
+            flex-direction: column;
+        }
+        .modal form input {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bikes GridView</h1>
+    <button id="addBikeBtn">Add Bike</button>
+    <div class="grid-container" id="bikesGrid">
+        <!-- Bike cards will be inserted here by JavaScript -->
+    </div>
+
+    <!-- Modal -->
+    <div id="bikesModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Add Bike</h2>
+            <form id="bikeForm">
+                <label for="bikeId">ID:</label>
+                <input type="number" id="bikeId" name="id" required><br>
+                <label for="bikeTitle">Title:</label>
+                <input type="text" id="bikeTitle" name="title" required><br>
+                <label for="bikePrice">Price:</label>
+                <input type="text" id="bikePrice" name="price" required><br>
+                <button type="submit">Save</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const bikeModal = document.getElementById('bikesModal');
+        const bikeBtn = document.getElementById('addBikeBtn');
+        const bikeSpan = document.getElementsByClassName('close')[1];
+        const bikeForm = document.getElementById('bikeForm');
+        const bikeGrid = document.getElementById('bikesGrid');
+
+        bikeBtn.onclick = function() {
+            bikeModal.style.display = 'block';
+        }
+
+        bikeSpan.onclick = function() {
+            bikeModal.style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == bikeModal) {
+                bikeModal.style.display = 'none';
+            }
+        }
+
+        bikeForm.onsubmit = function(e) {
+            e.preventDefault();
+            const id = document.getElementById('bikeId').value;
+            const title = document.getElementById('bikeTitle').value;
+            const price = document.getElementById('bikePrice').value;
+
+            let bikes = JSON.parse(localStorage.getItem('bikes')) || [];
+            bikes.push({ id, title, price });
+            localStorage.setItem('bikes', JSON.stringify(bikes));
+
+            bikeModal.style.display = 'none';
+            updateBikesGrid();
+        }
+
+        function updateBikesGrid() {
+            bikeGrid.innerHTML = '';
+
+            let bikes = JSON.parse(localStorage.getItem('bikes')) || [];
+            bikes.forEach(bike => {
+                const card = document.createElement('div');
+                card.className = 'bike-card';
+                card.innerHTML = `
+                    <h2>${bike.title}</h2>
+                    <p>Price: ${bike.price}</p>
+                    <button onclick="viewBike(${bike.id})">View Details</button>
+                `;
+                bikeGrid.appendChild(card);
+            });
+        }
+
+        function viewBike(id) {
+            window.location.href = `Ques3.html?bikeId=${id}`;
+        }
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', updateBikesGrid);
+    </script>
+</body>
+</html>

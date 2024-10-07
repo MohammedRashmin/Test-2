@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bikes GridView</title>
+    <style>
+        .grid-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .bike-card {
+            border: 1px solid #ddd;
+            padding: 10px;
+            width: calc(33% - 20px);
+            box-sizing: border-box;
+            text-align: center;
+        }
+        .bike-card h2 {
+            margin: 0 0 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bikes GridView</h1>
+    <div class="grid-container" id="bikesGrid">
+        <!-- Bike cards will be inserted here by JavaScript -->
+    </div>
+
+    <script>
+        const bikes = [
+            { "id": 1, "title": "Bike A", "price": "$100" },
+            { "id": 2, "title": "Bike B", "price": "$150" }
+        ];
+
+        const gridContainer = document.getElementById('bikesGrid');
+
+        bikes.forEach(bike => {
+            const card = document.createElement('div');
+            card.className = 'bike-card';
+            card.innerHTML = `
+                <h2>${bike.title}</h2>
+                <p>Price: ${bike.price}</p>
+                <button onclick="viewBike(${bike.id})">View Details</button>
+            `;
+            gridContainer.appendChild(card);
+        });
+
+        function viewBike(id) {
+            window.location.href = `Ques3.html?bikeId=${id}`;
+        }
+    </script>
+</body>
+</html>
